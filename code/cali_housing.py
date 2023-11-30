@@ -28,16 +28,16 @@ def create_search_space(seed=123):
 
     cs.add_hyperparameters([
         CS.UniformIntegerHyperparameter(
-            'max_depth', lower=1, upper=15, default_value=2, log=False
+            'max_depth', lower=1, upper=20, default_value=2, log=False
         ),
         CS.UniformIntegerHyperparameter(
-            'min_samples_split', lower=2, upper=128, default_value=2, log=True
+            'min_samples_split', lower=2, upper=256, default_value=2, log=True
         ),
         CS.UniformFloatHyperparameter(
             'max_features', lower=0.1, upper=0.9, default_value=0.5, log=False
         ),
         CS.UniformIntegerHyperparameter(
-            'min_samples_leaf', lower=1, upper=64, default_value=1, log=True
+            'min_samples_leaf', lower=1, upper=256, default_value=1, log=True
         ),
     ])
     return cs
@@ -47,8 +47,8 @@ def prepare_cali_housing(seed=123):
     _data = fetch_california_housing(as_frame=True)
 
     train_X, rest_X, train_y, rest_y = train_test_split(
-      _data.get("data")[:2000],
-      np.log(_data.get("target")[:2000]),
+      _data.get("data")[:200],
+      np.log(_data.get("target")[:200]),
       train_size=0.7,
       shuffle=True,
       random_state=seed
@@ -171,7 +171,7 @@ def run_basic_experiment(fig_name=None, fig_title=None, df_name=None, fevals=75,
     return df_rand1, plot_experiments([df_rand1], fig_name=fig_name, fig_title=fig_title)
 
 
-def run_noise_experiment(fig_name=None, fig_title=None, df_prefix=None, fevals=75, runs=10):
+def run_noise_experiment(fig_name=None, fig_title=None, df_prefix=None, noise_scale=0.5, fevals=75, runs=10):
     min_budget, max_budget = constraints_setup()
     cs = create_search_space()
     dimensions = len(cs.get_hyperparameters())
@@ -205,7 +205,7 @@ def run_noise_experiment(fig_name=None, fig_title=None, df_prefix=None, fevals=7
                     n_workers=1,
                     output_path="./noisy1_bin_logs",
                     strategy='noisy1_bin',
-                    noise_scale=0.5
+                    noise_scale=noise_scale
     )
     df_noisy1 = run_dehb_test(dehb_noisy1, train_X, train_y, valid_X, valid_y, fevals=fevals, runs=runs)
 
